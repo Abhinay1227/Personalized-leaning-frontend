@@ -1,0 +1,164 @@
+:root{
+  --card:#fff;
+  --bg:#eaf4fb;
+  --muted:#6b7280;
+  --text:#0f172a;
+  --focus:#2263b3;
+  --shadow: 0 30px 80px rgba(0,0,0,.12);
+  --radius:22px;
+}
+
+/* Full page background */
+.auth-page{
+  min-height:100vh;
+  background: radial-gradient(1200px 600px at 10% 0%, #e6fff3 0%, #eaf4fb 55%, #e8f2ff 100%);
+  display:flex; align-items:center; justify-content:center;
+  padding:36px;
+  box-sizing:border-box;
+}
+
+/* Unified card holding both halves */
+.auth-card{
+  width: min(1120px, 94vw);
+  height: 560px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow:hidden;          /* important: unify visuals */
+  display:grid;
+  grid-template-columns: 1fr 1fr;  /* two halves */
+  position:relative;
+}
+
+/* Left and right halves share base styles */
+.auth-side{
+  height:100%;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.left{
+  /* soft green panel */
+  background: linear-gradient(180deg, #ecfff2 0%, #d8f5e7 100%);
+  position:relative;
+}
+.left::after{
+  content:"";
+  position:absolute; inset:0;
+  background: radial-gradient(60% 60% at 30% 35%, #ffffffaa 0%, #ffffff22 60%, transparent 100%);
+  pointer-events:none;
+}
+
+.left-inner{
+  width:min(520px, 88%);
+  text-align:center;
+}
+.hero-ill{
+  width:min(360px, 70%);
+  height:auto; display:block; margin:0 auto 18px;
+}
+.left-inner h3{
+  margin:6px 0 4px; color:#0e3b2e; font-weight:700;
+}
+.left-inner p{
+  margin:0; color:#1f5a4a; opacity:.9;
+}
+.pager{ margin-top:18px; display:flex; gap:8px; justify-content:center; }
+.dot{ width:8px; height:8px; border-radius:50%; background:#9adfbf; opacity:.55; }
+.dot.active{ background:#34d399; opacity:1; }
+
+/* Right side (form) */
+.right{
+  background:#fdfefe;  /* subtle difference from left, still part of one card */
+}
+
+.right-inner{
+  width:min(520px, 86%);
+  margin:0 auto;
+}
+
+.brand{
+  font-family: Georgia, serif;
+  color:#111827; letter-spacing:2px; font-size:26px; margin-top:6px;
+}
+.welcome{ margin:12px 0 22px; color:#6b7280; font-weight:600; }
+
+.label{
+  display:block; color:var(--muted); font-size:14px; margin:10px 0 6px;
+}
+.input{
+  width:100%; height:46px; border:0; outline:none; color:var(--text);
+  background:transparent;
+}
+.underline{
+  border-bottom:1.5px solid #e5e7eb; padding:0 2px;
+  transition:border-color .2s, box-shadow .2s, padding .2s, height .2s, border-radius .2s;
+}
+.underline:focus{
+  border-color:var(--focus); box-shadow: 0 0 0 4px #2263b322;
+  border-radius:10px; height:50px; padding:0 10px;
+}
+
+.row{ display:flex; align-items:center; gap:8px; }
+.between{ justify-content:space-between; }
+
+.btn{
+  width:100%; height:48px; border-radius:12px; border:0; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  font-weight:600; transition: transform .05s ease, box-shadow .2s ease, background .2s;
+}
+.btn:active{ transform: translateY(1px); }
+.primary{ margin-top:14px; background:#0f172a; color:#fff; box-shadow: 0 10px 26px rgba(15,23,42,.22); }
+.primary:hover{ background:#14233c; }
+  /* Put this near your form styles */
+.row.between {
+  margin-top: 10px; /* was 8px; increase as you like */
+}
+
+.link{ background:none; border:0; padding:0; color:#22a39f; font-weight:600; cursor:pointer; }
+.link.subtle{ color:#6b9fad; font-weight:500; }
+.link:hover{ text-decoration:underline; }
+
+.form-error{
+  margin:10px 0 0; padding:10px 12px; border-radius:10px;
+  background:#fee2e2; color:#991b1b; font-weight:600;
+}
+
+.signup{ margin-top:16px; color:#6b7280; }
+
+/* Responsive: stack sides but keep single card */
+@media (max-width: 1024px){
+  .auth-card{ grid-template-columns: 1fr; height:auto; }
+  .left{ padding:22px 18px; }
+  .right{ padding:10px 0 22px; }
+  .right-inner{ width:90%; }
+}
+/* Remove overlay that dims the SVG */
+.left::after { content: none; }
+
+body .auth-page { background: #b3c4cf ; }
+
+
+/* Slide typography refinements */
+.slide-title { margin: 8px 0 6px; color:#0e3b2e; font-weight:700; }
+.slide-text  { margin: 0; color:#1f5a4a; opacity:.9; }
+
+/* Dots as buttons */
+.pager .dot{
+  width:10px; height:10px; border-radius:50%;
+  background:#a7e1c4; opacity:.55; border:0; cursor:pointer;
+  transition: transform .15s ease, opacity .15s ease, background-color .15s ease;
+}
+.pager .dot:hover{ transform: scale(1.1); opacity:.8; }
+.pager .dot.active{ background:#34d399; opacity:1; }
+
+/* Nice fade-in when changing slides */
+.fade-in{
+  animation: fadeIn .35s ease;
+}
+@keyframes fadeIn{
+  from { opacity:0; transform: translateY(4px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){
+  .fade-in{ animation: none; }
+}
