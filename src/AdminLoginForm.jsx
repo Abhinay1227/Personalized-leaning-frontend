@@ -10,33 +10,35 @@ export default function AdminLoginForm() {
   const navigate = useNavigate();
 
   const submit = async (e) => {
-    e.preventDefault();
-    setErr("");
+  e.preventDefault();
+  setErr("");
 
-    if (!username) {
-      setErr("Please enter your username");
-      return;
+  if (!username) {
+    setErr("Please enter your username");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/accounts/admin-login/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("accessToken", data.access);
+      localStorage.setItem("refreshToken", data.refresh);
+      navigate("/admin-dashboard");
+    } else {
+      setErr(data.error || "Login failed. Please check your credentials.");
     }
+  } catch (e) {
+    setErr("Network error, please try again later.");
+  }
+};
 
-    try {
-      const res = await fetch("http://127.0.0.1:8000/accounts/admin/login-api/", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }), // changed to username
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        navigate("/admin-dashboard"); // redirect to admin dashboard
-      } else {
-        setErr(data.error || "Login failed. Please check your credentials.");
-      }
-    } catch (e) {
-      setErr("Network error, please try again later.");
-    }
-  };
 
   return (
     <div className="auth-page">

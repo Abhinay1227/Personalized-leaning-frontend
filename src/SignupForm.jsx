@@ -8,56 +8,62 @@ import Slide2 from "./assets/Sign up-bro.svg";
 import Analytics from "./assets/Filing system-bro.svg";
 
 export default function SignupForm() {
-  // Form state
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail]       = useState("");
+  // Form states
+  const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm]   = useState("");
-  const [agree, setAgree]       = useState(false);
-  const [showPwd, setShowPwd]   = useState(false);
+  const [confirm, setConfirm] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [showPwd, setShowPwd] = useState(false);
   const [showCPwd, setShowCPwd] = useState(false);
-  const [err, setErr]           = useState("");
+  const [err, setErr] = useState("");
 
   const validateEmail = (v) => /\S+@\S+\.\S+/.test(v);
 
   const submit = async (e) => {
-  e.preventDefault();
-  setErr("");
+    e.preventDefault();
+    setErr("");
 
-  if (!fullName.trim()) return setErr("Please enter your full name.");
-  if (!validateEmail(email)) return setErr("Enter a valid email.");
-  if (password.length < 6) return setErr("Password must be at least 6 characters.");
-  if (password !== confirm) return setErr("Passwords do not match.");
-  if (!agree) return setErr("Please accept the Terms & Privacy Policy.");
+    if (!username.trim()) return setErr("Please enter your username.");
+    if (!firstName.trim()) return setErr("Please enter your first name.");
+    if (!lastName.trim()) return setErr("Please enter your last name.");
+    if (!validateEmail(email)) return setErr("Enter a valid email.");
+    if (password.length < 6) return setErr("Password must be at least 6 characters.");
+    if (password !== confirm) return setErr("Passwords do not match.");
+    if (!agree) return setErr("Please accept the Terms & Privacy Policy.");
 
-  try {
-    const response = await fetch("http://127.0.0.1:8000/accounts/signup-api/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username: email,       // using email as username
-        password: password,
-        full_name: fullName,   // optional, you can save in profile later
-      }),
-      credentials: "include", // send cookies if using sessions
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/accounts/signup/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username,
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password,
+          password2: confirm,
+        }),
+        credentials: "include",
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      alert(data.message);       // success message from Django
-      window.location.href = "/login"; // redirect to login page
-    } else {
-      setErr(data.error);        // error message from Django
+      if (response.ok) {
+        alert("Account created successfully!");
+        window.location.href = "/login";
+      } else {
+        setErr(JSON.stringify(data));
+      }
+    } catch (error) {
+      setErr("Something went wrong. Try again.");
+      console.error(error);
     }
-  } catch (error) {
-    setErr("Something went wrong. Try again.");
-    console.error(error);
-  }
-};
+  };
 
-
-  // Left slider (same UX as login)
+  // Left slider (same UX as before)
   const slides = [
     {
       title: "Create Your Account",
@@ -105,7 +111,7 @@ export default function SignupForm() {
     setPaused(true);
   };
   const onTouchEnd = (e) => {
-    const dx = e.changedTouches.clientX - touchStartX.current;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
     const threshold = 40;
     if (dx > threshold) goto((currentSlide - 1 + slides.length) % slides.length);
     else if (dx < -threshold) goto((currentSlide + 1) % slides.length);
@@ -158,14 +164,36 @@ export default function SignupForm() {
             <h2 className="welcome">Create your account</h2>
 
             <form className="form" onSubmit={submit} noValidate>
-              <label className="label">Full name</label>
+              <label className="label">Username</label>
               <input
                 className="input underline"
                 type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                autoComplete="name"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                autoComplete="username"
+                required
+              />
+
+              <label className="label">First Name</label>
+              <input
+                className="input underline"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Enter your first name"
+                autoComplete="given-name"
+                required
+              />
+
+              <label className="label">Last Name</label>
+              <input
+                className="input underline"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Enter your last name"
+                autoComplete="family-name"
                 required
               />
 
@@ -240,7 +268,7 @@ export default function SignupForm() {
             </form>
 
             <p className="signup">
-                Already have an account? <Link className="link" to="/login">Sign In</Link>
+              Already have an account? <Link className="link" to="/login">Sign In</Link>
             </p>
           </div>
         </main>

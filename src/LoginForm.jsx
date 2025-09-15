@@ -8,44 +8,43 @@ import Slide2 from "./assets/Sign up-bro.svg";
 import Analytics from "./assets/Filing system-bro.svg";
 
 export default function LoginForm() {
-  const navigate = useNavigate(); // FIX 1: define navigate
+  const navigate = useNavigate();
 
-  // Auth form state
-  const [email, setEmail] = useState("");
+  // Change state from email to username
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
 
   const submit = async (e) => {
-  e.preventDefault();
-  setErr("");
+    e.preventDefault();
+    setErr("");
 
-  try {
-    const res = await fetch("http://127.0.0.1:8000/accounts/login-api/", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: email, password }),
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/accounts/login/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // Send username and password as credentials
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await res.json();
-    console.log("Login response:", res.status, data);
+      const data = await res.json();
+      console.log("Login response:", res.status, data);
 
-    if (res.ok) {
-      navigate("/dashboard"); // direct redirect
-    } else {
-      setErr(data.error || "Login failed");
+      if (res.ok) {
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+
+        navigate("/dashboard");
+      } else {
+        setErr(data.detail || data.error || "Login failed");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setErr("Something went wrong");
     }
-  } catch (err) {
-    console.error("Error:", err);
-    setErr("Something went wrong");
-  }
-};
+  };
 
-
-
-
-
-  // Slides
+  // Slides unchanged
   const slides = [
     { title: "Distance Learning Programs", text: "Attend live and recorded classes at your own convenience.", img: Illustration },
     { title: "Adaptive Learning Paths", text: "Personalized recommendations based on progress, strengths, and pace.", img: Slide1 },
@@ -58,7 +57,6 @@ export default function LoginForm() {
   const timerRef = useRef(null);
   const intervalMs = 4000;
 
-  // Autoplay with pause on hover
   useEffect(() => {
     if (paused) return;
     timerRef.current = setTimeout(() => {
@@ -72,14 +70,13 @@ export default function LoginForm() {
     setCurrentSlide(i);
   };
 
-  // Touch swipe
   const touchStartX = useRef(null);
   const onTouchStart = (e) => {
     touchStartX.current = e.changedTouches[0].clientX;
     setPaused(true);
   };
   const onTouchEnd = (e) => {
-    const dx = e.changedTouches.clientX - touchStartX.current; // FIX 2
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
     const threshold = 40;
     if (dx > threshold) goto((currentSlide - 1 + slides.length) % slides.length);
     else if (dx < -threshold) goto((currentSlide + 1) % slides.length);
@@ -132,19 +129,21 @@ export default function LoginForm() {
             <h2 className="welcome">Welcome to Learnify</h2>
 
             <form className="form" onSubmit={submit} noValidate>
-              <label className="label">Email</label> {/* FIX 3: label matches validation */}
+              <label className="label" htmlFor="username">Username</label> {/* Changed to username */}
               <input
+                id="username"
                 className="input underline"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="Enter your email"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                placeholder="Enter your username"
                 required
               />
 
-              <label className="label">Password</label>
+              <label className="label" htmlFor="password">Password</label>
               <input
+                id="password"
                 className="input underline"
                 type="password"
                 value={password}
@@ -175,15 +174,15 @@ export default function LoginForm() {
               </button>
             </p>
             <p className="signup">
-  Are you an admin?{" "}
-  <button
-    className="link"
-    type="button"
-    onClick={() => navigate("/admin-login")}
-  >
-    Admin Login
-  </button>
-</p>
+              Are you an admin?{" "}
+              <button
+                className="link"
+                type="button"
+                onClick={() => navigate("/admin-login")}
+              >
+                Admin Login
+              </button>
+            </p>
           </div>
         </main>
       </div>

@@ -518,3 +518,69 @@ html {
 #feature3 {
   scroll-margin-top: 80px; /* Adjust based on navbar height */
 }
+    .dark-theme {
+  background: #171e25;
+  color: #eaf3fa;
+}
+
+.dark-theme .main-nav {
+  background: #1b2533;
+  box-shadow: 0 2px 16px #0002;
+}
+
+.dark-theme .logo {
+  color: #5ac3fa;
+}
+
+.dark-theme .nav-link {
+  background: #232e41;
+  color: #5ac3fa;
+}
+
+.dark-theme .nav-link:hover {
+  background: #5ac3fa;
+  color: #232e41;
+}
+
+.dark-theme .contact-btn {
+  background: #375576;
+  color: #fff;
+}
+
+.dark-theme .contact-btn:hover {
+  background: #5ac3fa;
+  color: #232e41;
+}
+
+.dark-theme .feature-context,
+.dark-theme .feature-row,
+.dark-theme .feedback-card {
+  background: #232e41 !important;
+  color: #eaf3fa !important;
+  box-shadow: 0 4px 20px #0003;
+}
+
+.dark-theme .feedback-card p,
+.dark-theme .feedback-card span {
+  color: #afd7ff !important;
+}
+
+.dark-theme .feedback-avatar {
+  box-shadow: 0 2px 8px #5ac3fa3c;
+}
+
+.dark-theme .slider-dots .dot {
+  border: 1.5px solid #5ac3fa;
+  opacity: 0.8;
+}
+.dark-theme .slider-dots .dot.active {
+  background: #5ac3fa !important;
+}
+.dark-theme .homepage-footer {
+  background: #232e41;
+  color: #90caec;
+}
+.dark-theme #about {
+  background: #1b2533;
+  color: #eaf3fa;
+}

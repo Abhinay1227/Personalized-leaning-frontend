@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './HomePage.css';
 import { useInView } from 'react-intersection-observer';
-import { useNavigate } from "react-router-dom"; // ADD THIS LINE
+import { useNavigate } from "react-router-dom";
+
 // SVG Imports
 import LearningAmio from './assets/Learning-amico.svg';
 import { ReactComponent as HappyStudentBro } from './assets/Happy student-bro.svg';
@@ -9,39 +10,40 @@ import { ReactComponent as CustomerFeedbackSVG } from './assets/Customer feedbac
 
 function HomePage() {
   const bgColors = [
-  "#fff7b2",    // Bright pastel yellow
-  "#aeefff",    // Vivid light blue
-  "#ffb4e6",    // Pastel pink-mauve
-  "#bcffb2"     // Bright mint green
-];
- const navigate = useNavigate();
+    "#fff7b2",    // Bright pastel yellow
+    "#aeefff",    // Vivid light blue
+    "#ffb4e6",    // Pastel pink-mauve
+    "#bcffb2"     // Bright mint green
+  ];
 
+  const navigate = useNavigate();
 
   const feedbacks = [
-  {
-    quote: "This platform helped me improve my coding skills!",
-    author: "John D.",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-  },
-  {
-    quote: "The real-time analysis feature is a game changer.",
-    author: "Sarah W.",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-  },
-  {
-    quote: "Easy to use and very effective for learning.",
-    author: "Alex T.",
-    avatar: "https://randomuser.me/api/portraits/men/65.jpg"
-  },
-  {
-    quote: "Learnify adapts perfectly to my pace.",
-    author: "Priya S.",
-    avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-  }
-];
-
+    {
+      quote: "This platform helped me improve my coding skills!",
+      author: "John D.",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
+    },
+    {
+      quote: "The real-time analysis feature is a game changer.",
+      author: "Sarah W.",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
+    },
+    {
+      quote: "Easy to use and very effective for learning.",
+      author: "Alex T.",
+      avatar: "https://randomuser.me/api/portraits/men/65.jpg"
+    },
+    {
+      quote: "Learnify adapts perfectly to my pace.",
+      author: "Priya S.",
+      avatar: "https://randomuser.me/api/portraits/women/68.jpg"
+    }
+  ];
 
   const [current, setCurrent] = useState(0);
+
+  const [darkTheme, setDarkTheme] = useState(false);
 
   // Autoplay effect (change slide every 3.5s)
   useEffect(() => {
@@ -51,8 +53,6 @@ function HomePage() {
     return () => clearTimeout(timer);
   }, [current, feedbacks.length]);
 
-
-
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
   const { ref: textRef, inView: textInView } = useInView({ triggerOnce: true, threshold: 0.3 });
 
@@ -61,7 +61,7 @@ function HomePage() {
   useEffect(() => {
     if (!inView) return;
     const targets = { students: 500, quizzes: 85, modules: 25 };
-    const duration = 2500; 
+    const duration = 2500;
     const frameRate = 60;
     const totalFrames = Math.round((duration / 1000) * frameRate);
     let frame = 0;
@@ -80,18 +80,33 @@ function HomePage() {
   }, [inView]);
 
   return (
-    <div className="homepage-illustration">
-
+    <div className={`homepage-illustration${darkTheme ? ' dark-theme' : ''}`}>
       {/* Navigation */}
       <nav className="main-nav">
-  <div className="logo">Learnify</div>
-  <ul className="nav-links">
-    <li><a href="#features" className="nav-link">Features</a></li>
-    <li><a href="#feature3" className="nav-link">Testimonials</a></li>
-    <li><button className="contact-btn">Contact Us</button></li>
-  </ul>
-</nav>
-
+        <div className="logo">Learnify</div>
+        <ul className="nav-links">
+          <li><a href="#features" className="nav-link">Features</a></li>
+          <li><a href="#feature3" className="nav-link">Testimonials</a></li>
+          <li><button className="contact-btn">Contact Us</button></li>
+          <li>
+            <button
+              className="theme-toggle-btn"
+              onClick={() => setDarkTheme((d) => !d)}
+              title={darkTheme ? "Switch to light mode" : "Switch to dark mode"}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: 22,
+                cursor: 'pointer',
+                marginLeft: 14,
+                color: darkTheme ? '#5ac3fa' : '#2263b3'
+              }}
+            >
+              {darkTheme ? "🌙" : "☀️"}
+            </button>
+          </li>
+        </ul>
+      </nav>
 
       {/* Hero */}
       <section id="hero" className="hero-illustration">
@@ -105,7 +120,7 @@ function HomePage() {
             <br />
             Personalized Dashboard and real-time analytics – all at your fingertips.
           </p>
-          <button className="explore-cta" onClick={() => navigate("/login")}> Explore Now </button>
+          <button className="explore-cta" onClick={() => navigate("/login")}>Explore Now</button>
         </div>
         <div className="hero-img-area">
           <img
@@ -184,30 +199,28 @@ function HomePage() {
             </p>
             {/* Autoplay slider, no arrows, just dots */}
             <div className="feedback-slider">
-  <div
-    className="feedback-card"
-    style={{ background: bgColors[current] }}
-  >
-    <img
-      src={feedbacks[current].avatar}
-      alt={feedbacks[current].author}
-      className="feedback-avatar"
-    />
-    <p>"{feedbacks[current].quote}"</p>
-    <span>- {feedbacks[current].author}</span>
-  </div>
-  <div className="slider-dots">
-    {feedbacks.map((_, idx) => (
-      <span
-        key={idx}
-        className={`dot ${current === idx ? 'active' : ''}`}
-        onClick={() => setCurrent(idx)}
-      />
-    ))}
-  </div>
-</div>
-
-
+              <div
+                className="feedback-card"
+                style={{ background: bgColors[current] }}
+              >
+                <img
+                  src={feedbacks[current].avatar}
+                  alt={feedbacks[current].author}
+                  className="feedback-avatar"
+                />
+                <p>"{feedbacks[current].quote}"</p>
+                <span>- {feedbacks[current].author}</span>
+              </div>
+              <div className="slider-dots">
+                {feedbacks.map((_, idx) => (
+                  <span
+                    key={idx}
+                    className={`dot ${current === idx ? 'active' : ''}`}
+                    onClick={() => setCurrent(idx)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
           <div className="feature-img">
             <CustomerFeedbackSVG className="feature-svg" />

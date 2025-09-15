@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
-import Dashboard from "./components/Dashboard"; // Direct route
+import Dashboard from "./pages/Dashboard"; // Direct route
 import AdminLoginForm from "./AdminLoginForm";
 import AdminDashboard from "./AdminDashboard";
 
