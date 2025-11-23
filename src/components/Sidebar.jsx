@@ -5,6 +5,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import EventIcon from '@mui/icons-material/Event';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const navItems = [
   { label: 'Dashboard', icon: <DashboardIcon /> },
@@ -15,12 +16,8 @@ const navItems = [
   { label: 'Settings', icon: <SettingsIcon /> },
 ];
 
-const activeNav = 'Dashboard';
-
-const Sidebar = ({ mode }) => {
+const Sidebar = ({ mode, activeSection, setActiveSection }) => {
   const isMini = mode === 'mini';
-
-  // All icons and text set to white for visibility
   const iconColor = '#ffffff';
   const textColor = '#ffffff';
 
@@ -39,7 +36,7 @@ const Sidebar = ({ mode }) => {
         borderBottomRightRadius: '32px',
       }}
     >
-      {/* Logo & App Name */}
+      {/* Logo & Title */}
       <div
         style={{
           display: 'flex',
@@ -63,13 +60,14 @@ const Sidebar = ({ mode }) => {
         {!isMini && <span>Learnify</span>}
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Items */}
       <nav style={{ flexGrow: 1, width: '100%' }}>
         {navItems.map(({ label, icon }) => {
-          const isActive = activeNav === label;
+          const isActive = activeSection === label;
           return (
             <div
               key={label}
+              onClick={() => setActiveSection(label)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -79,8 +77,6 @@ const Sidebar = ({ mode }) => {
                 fontWeight: isActive ? 700 : 600,
                 borderTopRightRadius: '16px',
                 borderBottomRightRadius: '16px',
-                borderTopLeftRadius: '0px',
-                borderBottomLeftRadius: '0px',
                 marginBottom: '0.5rem',
                 color: textColor,
                 background: isActive ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
@@ -107,7 +103,29 @@ const Sidebar = ({ mode }) => {
         })}
       </nav>
 
-      {/* Upgrade button removed */}
+      {/* Logout Button */}
+      <div
+        onClick={() => setActiveSection('Logout')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: isMini ? 'center' : 'flex-start',
+          padding: isMini ? '0.65rem 0' : '0.75rem 1rem',
+          cursor: 'pointer',
+          fontWeight: 600,
+          borderTopRightRadius: '16px',
+          borderBottomRightRadius: '16px',
+          marginTop: 'auto',
+          color: textColor,
+          background: 'transparent',
+          transition: 'all 0.2s linear',
+          width: '100%',
+          gap: isMini ? '0' : '1rem',
+        }}
+      >
+        <LogoutIcon style={{ color: iconColor, fontSize: isMini ? '1.6rem' : '1.4rem' }} />
+        {!isMini && <span>Logout</span>}
+      </div>
     </aside>
   );
 };

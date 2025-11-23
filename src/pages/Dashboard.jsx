@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import StudentGreetingCard from '../components/StudentGreetingCard';
 import CalendarCard from '../components/CalendarCard';
-import StudentGreetingCard from '../components/StudentGreetingCard'; // Import your greeting card
+import StudentProfileCard from '../components/StudentProfileCard';
+import StudentProfileModal from '../components/StudentProfileModal';
+import Courses from '../components/courses/Courses';
+import MyEnrollmentsCard from '../components/MyEnrollmentsCard';
 import { IconButton } from '@mui/material';
 import { ChevronRight, ChevronLeft } from '@mui/icons-material';
+import LearningAnalyticsOverview from '../components/LearningAnalyticsOverview';
+import SkillProgressCard from '../components/SkillProgressCard';
+import WeeklyActivityCard from '../components/WeeklyActivityCard';
+import AIInsightsCard from '../components/AIInsightsCard';
+import Chat from '../components/Chat';
+import Schedule from '../components/Schedule';
+import Profile from '../components/Profile';
+import Settings from '../components/Settings';
 
 const SIDEBAR_WIDTH = 240;
 const MINI_SIDEBAR_WIDTH = 64;
@@ -13,13 +25,12 @@ const RIGHT_SIDEBAR_WIDTH = 320;
 const Dashboard = () => {
   const [sidebarMode, setSidebarMode] = useState('full');
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
-  
-  const toggleSidebar = () =>
-    setSidebarMode((prev) => (prev === 'full' ? 'mini' : 'full'));
-    
-  const toggleRightSidebar = () =>
-    setRightSidebarOpen((prev) => !prev);
-  
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('Dashboard');
+
+  const toggleSidebar = () => setSidebarMode((prev) => (prev === 'full' ? 'mini' : 'full'));
+  const toggleRightSidebar = () => setRightSidebarOpen((prev) => !prev);
+
   const sidebarWidth = sidebarMode === 'full' ? SIDEBAR_WIDTH : MINI_SIDEBAR_WIDTH;
 
   return (
@@ -34,6 +45,10 @@ const Dashboard = () => {
       {/* Left Sidebar */}
       <div
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          bottom: 0,
           width: sidebarWidth,
           minWidth: sidebarWidth,
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -45,41 +60,53 @@ const Dashboard = () => {
           borderBottomRightRadius: '32px',
         }}
       >
-        <Sidebar mode={sidebarMode} />
+        <Sidebar
+          mode={sidebarMode}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
       </div>
 
       {/* Main Content Area */}
       <div
         style={{
+          marginLeft: sidebarWidth,
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
           zIndex: 1,
+          padding: '2rem',
         }}
       >
-        <div style={{ padding: '2rem' }}>
-          <Header onToggleSidebar={toggleSidebar} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <Header onToggleSidebar={toggleSidebar} activeSection={activeSection} />
+          {activeSection === 'Dashboard' && <StudentGreetingCard />}
         </div>
 
-        {/* Student Greeting Card below Header */}
-        <div style={{ padding: '0 2rem 2rem 2rem' }}>
-          <StudentGreetingCard />
-        </div>
+        <div style={{ flex: 1, marginTop: '2rem' }}>
+          {activeSection === 'Dashboard' && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '1.5rem',
+                alignItems: 'stretch',
+              }}
+            >
+              <MyEnrollmentsCard />
+              <LearningAnalyticsOverview />
+              <SkillProgressCard />
+              <WeeklyActivityCard />
+              <AIInsightsCard />
+            </div>
+          )}
 
-        {/* Main content */}
-        <div style={{ flex: 1, padding: '0 2rem 2rem 2rem' }}>
-          <div
-            style={{
-              background: 'white',
-              padding: '2rem',
-              borderRadius: '12px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
-              marginBottom: '2rem',
-            }}
-          >
-            Dashboard Widgets Coming Soon...
-          </div>
+          {activeSection === 'Courses' && <Courses />}
+          {activeSection === 'Chat' && <Chat />}
+          {activeSection === 'Schedule' && <Schedule />}
+          {activeSection === 'Profile' && <Profile />}
+          {activeSection === 'Settings' && <Settings />}
         </div>
       </div>
 
@@ -137,7 +164,16 @@ const Dashboard = () => {
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        {rightSidebarOpen && <CalendarCard />}
+        {rightSidebarOpen && (
+          <>
+            <StudentProfileCard onClick={() => setProfileModalOpen(true)} />
+            <CalendarCard />
+            <StudentProfileModal
+              open={profileModalOpen}
+              onClose={() => setProfileModalOpen(false)}
+            />
+          </>
+        )}
       </div>
     </div>
   );

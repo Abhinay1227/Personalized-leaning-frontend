@@ -1,12 +1,12 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import MenuIcon from '@mui/icons-material/Menu';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const Header = ({ onToggleSidebar }) => {
   const location = useLocation();
 
   const pageNames = {
-    '/dashboard': 'Dashboard',
+    '/': 'Dashboard',
     '/courses': 'Courses',
     '/chat': 'Chat',
     '/schedule': 'Schedule',
@@ -23,11 +23,11 @@ const Header = ({ onToggleSidebar }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '1.5rem 2rem',
-        background: 'transparent', // 🚀 No white box
-        boxShadow: 'none', // 🚀 No shadow
+        background: 'transparent',
+        boxShadow: 'none',
       }}
     >
-      {/* Left: Dashboard title with icon */}
+      {/* Left: Page title with icon */}
       <div
         onClick={onToggleSidebar}
         style={{
@@ -39,14 +39,13 @@ const Header = ({ onToggleSidebar }) => {
           gap: '0.8rem',
           cursor: 'pointer',
           userSelect: 'none',
+          marginLeft: '-2rem',
+          marginTop: '-0.3rem',
         }}
       >
-        <MenuIcon fontSize="large" style={{ color: '#1976d2' }} />
+        <DashboardIcon fontSize="large" style={{ color: '#ec1b29ff' }} />
         {currentPage}
       </div>
-
-      {/* Right: (Optional) Search + Profile Avatar */}
-      {/* You can add later if you want */}
     </header>
   );
 };

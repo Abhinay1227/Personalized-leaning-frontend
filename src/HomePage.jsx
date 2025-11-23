@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './HomePage.css';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from "react-router-dom";
@@ -10,42 +10,99 @@ import { ReactComponent as CustomerFeedbackSVG } from './assets/Customer feedbac
 
 function HomePage() {
   const bgColors = [
-    "#fff7b2",    // Bright pastel yellow
-    "#aeefff",    // Vivid light blue
-    "#ffb4e6",    // Pastel pink-mauve
-    "#bcffb2"     // Bright mint green
+    "#fff7b2",
+    "#aeefff",
+    "#ffb4e6",
+    "#bcffb2"
   ];
 
   const navigate = useNavigate();
 
   const feedbacks = [
-    {
-      quote: "This platform helped me improve my coding skills!",
-      author: "John D.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    {
-      quote: "The real-time analysis feature is a game changer.",
-      author: "Sarah W.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg"
-    },
-    {
-      quote: "Easy to use and very effective for learning.",
-      author: "Alex T.",
-      avatar: "https://randomuser.me/api/portraits/men/65.jpg"
-    },
-    {
-      quote: "Learnify adapts perfectly to my pace.",
-      author: "Priya S.",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg"
-    }
+    { quote: "This platform helped me improve my coding skills!", author: "John D.", avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
+    { quote: "The real-time analysis feature is a game changer.", author: "Sarah W.", avatar: "https://randomuser.me/api/portraits/women/44.jpg" },
+    { quote: "Easy to use and very effective for learning.", author: "Alex T.", avatar: "https://randomuser.me/api/portraits/men/65.jpg" },
+    { quote: "Learnify adapts perfectly to my pace.", author: "Priya S.", avatar: "https://randomuser.me/api/portraits/women/68.jpg" }
   ];
 
   const [current, setCurrent] = useState(0);
-
   const [darkTheme, setDarkTheme] = useState(false);
 
-  // Autoplay effect (change slide every 3.5s)
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+  const { ref: textRef, inView: textInView } = useInView({ triggerOnce: true, threshold: 0.3 });
+
+  // Real counts from API
+  const [counts, setCounts] = useState({ students: 0, quizzes: 85, modules: 25 });
+  // Animated counts for display
+  const [animatedCounts, setAnimatedCounts] = useState({ students: 0, quizzes: 85, modules: 25 });
+  // Ref to ensure animation runs once
+  const hasAnimated = useRef(false);
+
+  // Fetch real student count on mount
+  useEffect(() => {
+    async function fetchStudentCount() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/analytics/students/', {
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (!res.ok) throw new Error('Failed to fetch student count');
+        const data = await res.json();
+        console.log("Student count API response:", data);
+        setCounts(prev => ({
+          students: data.students,
+          quizzes: prev.quizzes,
+          modules: prev.modules,
+        }));
+      } catch (error) {
+        console.error('Error fetching student count:', error);
+      }
+    }
+    fetchStudentCount();
+  }, []);
+
+  useEffect(() => {
+  // If not animating, sync immediately
+  if (!inView) {
+    setAnimatedCounts(counts);
+  }
+}, [counts, inView]);
+
+
+  // Animate counters when in view or counts change
+  useEffect(() => {
+    if (!inView || hasAnimated.current) return;
+    hasAnimated.current = true;
+
+    const duration = 2500; // animation duration in ms
+    const frameRate = 60;  // frames per second
+    const totalFrames = Math.round((duration / 1000) * frameRate);
+    let frame = 0;
+
+    const { students, quizzes, modules } = counts;
+
+    function step() {
+      frame++;
+      setAnimatedCounts({
+        students: Math.min(Math.round((students / totalFrames) * frame), students),
+        quizzes: Math.min(Math.round((quizzes / totalFrames) * frame), quizzes),
+        modules: Math.min(Math.round((modules / totalFrames) * frame), modules),
+      });
+      if (frame < totalFrames) {
+        requestAnimationFrame(step);
+      }
+    }
+
+    requestAnimationFrame(step);
+  }, [inView, counts]);
+  // Fallback: If not animating, always sync animatedCounts to real counts
+useEffect(() => {
+  if (!inView) {
+    setAnimatedCounts(counts);
+  }
+}, [counts, inView]);
+
+
+  // Slider autoplay effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setCurrent((prev) => (prev + 1) % feedbacks.length);
@@ -53,35 +110,8 @@ function HomePage() {
     return () => clearTimeout(timer);
   }, [current, feedbacks.length]);
 
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
-  const { ref: textRef, inView: textInView } = useInView({ triggerOnce: true, threshold: 0.3 });
-
-  const [counts, setCounts] = useState({ students: 0, quizzes: 0, modules: 0 });
-
-  useEffect(() => {
-    if (!inView) return;
-    const targets = { students: 500, quizzes: 85, modules: 25 };
-    const duration = 2500;
-    const frameRate = 60;
-    const totalFrames = Math.round((duration / 1000) * frameRate);
-    let frame = 0;
-
-    const step = () => {
-      frame++;
-      setCounts({
-        students: Math.min(Math.round((targets.students / totalFrames) * frame), targets.students),
-        quizzes: Math.min(Math.round((targets.quizzes / totalFrames) * frame), targets.quizzes),
-        modules: Math.min(Math.round((targets.modules / totalFrames) * frame), targets.modules),
-      });
-      if (frame < totalFrames) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
-  }, [inView]);
-
   return (
     <div className={`homepage-illustration${darkTheme ? ' dark-theme' : ''}`}>
-      {/* Navigation */}
       <nav className="main-nav">
         <div className="logo">Learnify</div>
         <ul className="nav-links">
@@ -91,7 +121,7 @@ function HomePage() {
           <li>
             <button
               className="theme-toggle-btn"
-              onClick={() => setDarkTheme((d) => !d)}
+              onClick={() => setDarkTheme(d => !d)}
               title={darkTheme ? "Switch to light mode" : "Switch to dark mode"}
               style={{
                 background: 'none',
@@ -108,7 +138,6 @@ function HomePage() {
         </ul>
       </nav>
 
-      {/* Hero */}
       <section id="hero" className="hero-illustration">
         <div className="hero-text">
           <h1>
@@ -123,15 +152,10 @@ function HomePage() {
           <button className="explore-cta" onClick={() => navigate("/login")}>Explore Now</button>
         </div>
         <div className="hero-img-area">
-          <img
-            src={LearningAmio}
-            alt="Education illustration"
-            style={{ width: 420, height: 'auto', maxWidth: '100%' }}
-          />
+          <img src={LearningAmio} alt="Education illustration" style={{ width: 420, height: 'auto', maxWidth: '100%' }} />
         </div>
       </section>
 
-      {/* Features with Counters */}
       <section id="features">
         <div className="feature-row left-img">
           <div className="feature-img">
@@ -140,7 +164,6 @@ function HomePage() {
           <div className="feature-context" ref={ref}>
             <h3>Adaptive Learning Paths</h3>
             <p>Personalized lessons and quizzes based on your progress.</p>
-            {/* Live Counters */}
             <div className="counters-premium">
               <div className="premium-counter-card accent-blue">
                 <div className="premium-counter-icon">
@@ -151,7 +174,7 @@ function HomePage() {
                     />
                   </svg>
                 </div>
-                <div className="premium-counter-number">{counts.students}</div>
+                <div className="premium-counter-number">{animatedCounts.students}</div>
                 <div className="premium-counter-label">Students</div>
               </div>
               <div className="premium-counter-card accent-green">
@@ -163,7 +186,7 @@ function HomePage() {
                     />
                   </svg>
                 </div>
-                <div className="premium-counter-number">{counts.quizzes}</div>
+                <div className="premium-counter-number">{animatedCounts.quizzes}</div>
                 <div className="premium-counter-label">Quizzes</div>
               </div>
               <div className="premium-counter-card accent-yellow">
@@ -175,49 +198,32 @@ function HomePage() {
                     />
                   </svg>
                 </div>
-                <div className="premium-counter-number">{counts.modules}</div>
+                <div className="premium-counter-number">{animatedCounts.modules}</div>
                 <div className="premium-counter-label">Modules</div>
               </div>
             </div>
-            <p
-              ref={textRef}
-              className={`below-counters-text ${textInView ? 'visible' : ''}`}
-            >
+
+            <p ref={textRef} className={`below-counters-text ${textInView ? 'visible' : ''}`}>
               Our intelligent system analyzes your progress and performance to recommend lessons and quizzes that match your unique needs and learning pace.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Third Feature Row - SVG on Right */}
       <section id="feature3">
         <div className="feature-row right-img">
           <div className="feature-context">
             <h3>Customer Feedback</h3>
-            <p>
-              Hear directly from our learners about how Learnify transforms their experience.
-            </p>
-            {/* Autoplay slider, no arrows, just dots */}
+            <p>Hear directly from our learners about how Learnify transforms their experience.</p>
             <div className="feedback-slider">
-              <div
-                className="feedback-card"
-                style={{ background: bgColors[current] }}
-              >
-                <img
-                  src={feedbacks[current].avatar}
-                  alt={feedbacks[current].author}
-                  className="feedback-avatar"
-                />
+              <div className="feedback-card" style={{ background: bgColors[current] }}>
+                <img src={feedbacks[current].avatar} alt={feedbacks[current].author} className="feedback-avatar" />
                 <p>"{feedbacks[current].quote}"</p>
                 <span>- {feedbacks[current].author}</span>
               </div>
               <div className="slider-dots">
                 {feedbacks.map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`dot ${current === idx ? 'active' : ''}`}
-                    onClick={() => setCurrent(idx)}
-                  />
+                  <span key={idx} className={`dot ${current === idx ? 'active' : ''}`} onClick={() => setCurrent(idx)} />
                 ))}
               </div>
             </div>
@@ -228,7 +234,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* About */}
       <section id="about" style={{ background: '#f8fbff', padding: 40, textAlign: 'center' }}>
         <h2>About Learnify</h2>
         <p style={{ maxWidth: 480, margin: '0 auto', color: '#375576' }}>
@@ -236,7 +241,6 @@ function HomePage() {
         </p>
       </section>
 
-      {/* Footer */}
       <footer className="homepage-footer">
         <div>&copy; 2025 Learnify | Built with ❤️</div>
       </footer>
